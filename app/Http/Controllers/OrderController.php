@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\OrderProduct;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -26,8 +28,30 @@ class OrderController extends Controller
         $order->precio = $request->total;
         $order->save();
 
+        // Get id
+        $id = $order->id;
+
+        // Get products
+        $products = $request->products;
+
+        $order_product = [];
+
+        // Format products
+        foreach ($products as $product) {
+            $order_product[] = [
+                'order_id' => $id,
+                'product_id'=> $product['id'],
+                'quantity'=> $product['quantity'],
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ];
+        }
+
+        // Save products the method insert allow save an array in the DB
+        OrderProduct::insert($order_product);
+
         return [
-            'mesagge'=>'Ordered'
+            'message'=>'Pedido realizado correctamente estara listo en unos momentos'
         ];
     }
 
